@@ -16,6 +16,6 @@ namespace Domain.Entities
         public bool Activo { get; set; }
         public DateTime FechaCreacion { get; set; }
         public DateTime? FechaModificacion { get; set; }
-        public List<Factura> Facturas { get; set; } = new List<Factura>();
+        public List<Archivo> Archivos { get; set; } = new List<Archivo>();
     }
 }

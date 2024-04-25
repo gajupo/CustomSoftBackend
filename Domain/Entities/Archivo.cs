@@ -9,8 +9,7 @@ namespace Domain.Entities
     public class Archivo
     {
         public int Id { get; set; }
-        public int FacturaId { get; set; }
-        public Factura Factura { get; set; }
+        public FileType TipoArchivo { get; set; }
         public string Nombre { get; set; }
         public long Tamano { get; set; }
         public string Extension { get; set; }
