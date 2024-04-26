@@ -9,10 +9,10 @@ namespace Infrastructure.Repositories.Core
 {
     public interface IProveedorRepository
     {
-        Task<List<Proveedor>> GetAllAsync();
-        Task<Proveedor> GetByIdAsync(int id);
-        Task CreateAsync(Proveedor proveedor);
-        Task UpdateAsync(Proveedor proveedor);
-        Task DeleteAsync(int id);
+        Task<List<Proveedor>> GetAllAsync(CancellationToken cancellationToken);
+        Task<Proveedor> GetByIdAsync(int id, CancellationToken cancellationToken);
+        Task<Proveedor> CreateAsync(Proveedor proveedor, CancellationToken cancellationToken);
+        Task<int> UpdateAsync(Proveedor proveedor, CancellationToken cancellationToken);
+        Task DeleteAsync(int id, CancellationToken cancellationToken);
     }
 }
