@@ -59,7 +59,7 @@ namespace Infrastructure.Repositories
             return proveedor;
         }
 
-        public async Task<int> UpdateAsync(Proveedor proveedor, CancellationToken cancellationToken)
+        public Task<int> UpdateAsync(Proveedor proveedor, CancellationToken cancellationToken)
         {
             var paramValues = new object[]
             {
@@ -70,13 +70,13 @@ namespace Infrastructure.Repositories
                 proveedor.Activo
             };
 
-            return await _databaseService.ExecuteNonQuerySPAsync("sp_update_proveedor", cancellationToken,
+            return _databaseService.ExecuteNonQuerySPAsync("sp_update_proveedor", cancellationToken,
                 paramValues);
         }
 
-        public async Task DeleteAsync(int id, CancellationToken cancellationToken)
+        public Task<int> DeleteAsync(int id, CancellationToken cancellationToken)
         {
-            await _databaseService.ExecuteNonQuerySPAsync("sp_delete_proveedor", cancellationToken, ("id", id));
+            return _databaseService.ExecuteNonQuerySPAsync("sp_delete_proveedor", cancellationToken, new object[] { id });
         }
     }
 }

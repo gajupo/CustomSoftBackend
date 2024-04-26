@@ -71,5 +71,19 @@ namespace CustomSoftWebApi.Controllers
 
             return NoContent();
         }
+
+        [HttpDelete("{proveedorId:int}")]
+        public async Task<IActionResult> DeleteProveedorAsync(int proveedorId)
+        {
+
+            var insertedProveedor = await mediator.Send(new DeleteProveedorCommand() { Id = proveedorId });
+
+            if (insertedProveedor == 0)
+            {
+                return ModelState.ThrowBadRequestObjectResult("Proveedores", "Unable to delete the given proveedor");
+            }
+
+            return NoContent();
+        }
     }
 }

@@ -13,6 +13,6 @@ namespace Infrastructure.Repositories.Core
         Task<Proveedor> GetByIdAsync(int id, CancellationToken cancellationToken);
         Task<Proveedor> CreateAsync(Proveedor proveedor, CancellationToken cancellationToken);
         Task<int> UpdateAsync(Proveedor proveedor, CancellationToken cancellationToken);
-        Task DeleteAsync(int id, CancellationToken cancellationToken);
+        Task<int> DeleteAsync(int id, CancellationToken cancellationToken);
     }
 }
