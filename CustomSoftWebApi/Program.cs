@@ -1,8 +1,10 @@
 using Application.Mappers;
+using Authentication.ApiKeys.Abstractions;
+using Authentication.ApiKeys;
 using Infrastructure.Config;
 using Infrastructure.Repositories;
 using Infrastructure.Repositories.Core;
-using System.Reflection;
+using Common;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,12 +21,24 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Appli
 
 builder.Services.AddControllers();
 
-var app = builder.Build();
+builder.Services
+    .AddDefaultApiKeyGenerator(new ApiKeyGenerationOptions
+    {
+        KeyPrefix = "KP-",
+        GenerateUrlSafeKeys = true,
+        LengthOfKey = 32
+    })
+    .AddDefaultClaimsPrincipalFactory()
+    .AddApiKeys()
+    .AddSingleton<IClientsService, InMemoryClientsService>()
+    .AddMemoryCache()
+    .AddSingleton<IApiKeysCacheService, CacheService>();
 
-// Configure the HTTP request pipeline.
+var app = builder.Build();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

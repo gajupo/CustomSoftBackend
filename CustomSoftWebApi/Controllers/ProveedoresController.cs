@@ -5,10 +5,12 @@ using AutoMapper;
 using Common.Helpers;
 using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CustomSoftWebApi.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ProveedoresController : ControllerBase
@@ -22,6 +24,7 @@ namespace CustomSoftWebApi.Controllers
             this.mapper = mapper;
         }
 
+        
         [HttpGet]
         public async Task<IActionResult> Proveedores()
         {
