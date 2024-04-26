@@ -5,7 +5,17 @@ using Infrastructure.Config;
 using Infrastructure.Repositories;
 using Infrastructure.Repositories.Core;
 using Common;
+using Serilog;
 
+try
+{
+
+}
+catch (Exception)
+{
+
+    throw;
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
