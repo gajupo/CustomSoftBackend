@@ -1,20 +1,21 @@
 {
   "profiles": {
-    "CustomSoftWebApi": {
+    "WebApp.Server": {
       "commandName": "Project",
       "launchUrl": "weatherforecast",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "https://localhost:7231;http://localhost:5248"
+      "applicationUrl": "https://localhost:7135;http://localhost:5215"
     },
     "IIS Express": {
       "commandName": "IISExpress",
-      "launchBrowser": true,
       "launchUrl": "weatherforecast",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy"
       }
     }
   },
@@ -23,8 +24,8 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:40802",
-      "sslPort": 44325
+      "applicationUrl": "http://localhost:55705",
+      "sslPort": 44319
     }
   }
 }

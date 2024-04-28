@@ -13,7 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastru
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{F05AD591-E907-4A35-806A-2D6E785C4FF9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authentication.ApiKeys", "Authentication.ApiKeys\Authentication.ApiKeys.csproj", "{5AE23190-27A0-4A5C-8786-10E388FC2040}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authentication.ApiKeys", "Authentication.ApiKeys\Authentication.ApiKeys.csproj", "{5AE23190-27A0-4A5C-8786-10E388FC2040}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp.Server", "WebApp\WebApp.Server\WebApp.Server.csproj", "{9D49BD5D-3D04-427B-956A-DCEA1F234F63}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "webapp.client", "WebApp\webapp.client\webapp.client.esproj", "{F9EAD11C-7706-4BE9-926B-800D44487E15}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +49,16 @@ Global
 		{5AE23190-27A0-4A5C-8786-10E388FC2040}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5AE23190-27A0-4A5C-8786-10E388FC2040}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5AE23190-27A0-4A5C-8786-10E388FC2040}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D49BD5D-3D04-427B-956A-DCEA1F234F63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D49BD5D-3D04-427B-956A-DCEA1F234F63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D49BD5D-3D04-427B-956A-DCEA1F234F63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D49BD5D-3D04-427B-956A-DCEA1F234F63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9EAD11C-7706-4BE9-926B-800D44487E15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9EAD11C-7706-4BE9-926B-800D44487E15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9EAD11C-7706-4BE9-926B-800D44487E15}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{F9EAD11C-7706-4BE9-926B-800D44487E15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9EAD11C-7706-4BE9-926B-800D44487E15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9EAD11C-7706-4BE9-926B-800D44487E15}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
