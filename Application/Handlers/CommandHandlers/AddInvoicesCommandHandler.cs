@@ -37,7 +37,7 @@ namespace Application.Handlers.CommandHandlers
             
             this.logger = logger;
 
-            fileRootPath = configuration.GetValue<string>("FilesRootFolder");
+            fileRootPath = null;//configuration.GetValue<string>("FilesRootFolder");
 
         }
         public async Task<bool> Handle(AddInvoicesCommand request, CancellationToken cancellationToken)

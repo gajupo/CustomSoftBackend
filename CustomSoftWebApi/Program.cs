@@ -1,5 +1,6 @@
 using Serilog;
 using CustomSoftWebApi.Extensions;
+using CustomSoftWebApi.Middlewares;
 
 // creating a initial log instance, to record messages before the host starts
 Log.Logger = new LoggerConfiguration()
@@ -32,6 +33,8 @@ try
         
     // build the host
     await using var app = builder.Build();
+    
+    app.UseMiddleware<ErrorHandlerMiddleware>();
 
     // middlewares section
     app.UseHttpsRedirection();
