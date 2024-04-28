@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 
-namespace Common.Helpers
+namespace Common.Exceptions
 {
     public static class CommonExceptions
     {

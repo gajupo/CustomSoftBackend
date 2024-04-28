@@ -19,5 +19,7 @@ namespace Domain.Entities
         public DateTime FechaCreacion { get; set; }
         [Required]
         public string? Ruta { get; set; }
+        [Required]
+        public int ProveedorId { get; set; }
     }
 }

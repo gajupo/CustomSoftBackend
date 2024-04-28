@@ -1,13 +1,7 @@
-using Application.Mappers;
-using Authentication.ApiKeys.Abstractions;
-using Authentication.ApiKeys;
-using Infrastructure.Config;
-using Infrastructure.Repositories;
-using Infrastructure.Repositories.Core;
-using Common;
 using Serilog;
+using CustomSoftWebApi.Extensions;
 
-
+// creating a initial log instance, to record messages before the host starts
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateBootstrapLogger();
@@ -18,46 +12,35 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    builder.Services.AddSerilog((services, lc) => lc
-        .ReadFrom.Configuration(builder.Configuration)
-        .ReadFrom.Services(services)
-        .Enrich.FromLogContext()
-        .WriteTo.Console());
-
     // Add services to the container.
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    builder.Services.AddScoped<IDatabaseService, DatabaseService>(provider => new DatabaseService(connectionString));
-    builder.Services.AddScoped<IProveedorRepository, ProveedorRepository>();
+    builder.ConfigureSerilog();
 
-    // register mapper profile
-    builder.Services.AddAutoMapper(typeof(MappingProfile));
+    builder.ConfigureDB();
 
-    builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Application.Handlers.QueryHandlers.GetProveedorListHandler).Assembly));
+    builder.ConfigureInfrastructure();
 
+    builder.ConfigureMappings();
+
+    builder.ConfigureMediatR();
+
+    builder.ConfigureApiKeyAuth();
+    
+    builder.ConfigureUploadFormOptions();
+    
     builder.Services.AddControllers();
 
-    builder.Services
-        .AddDefaultApiKeyGenerator(new ApiKeyGenerationOptions
-        {
-            KeyPrefix = "KP-",
-            GenerateUrlSafeKeys = true,
-            LengthOfKey = 32
-        })
-        .AddDefaultClaimsPrincipalFactory()
-        .AddApiKeys()
-        .AddSingleton<IClientsService, InMemoryClientsService>()
-        .AddMemoryCache()
-        .AddSingleton<IApiKeysCacheService, CacheService>();
-
+        
+    // build the host
     await using var app = builder.Build();
 
+    // middlewares section
     app.UseHttpsRedirection();
-
     app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapControllers();
 
+    // runing the app async
     await app.RunAsync();
 
     Log.Information("Api stopped");

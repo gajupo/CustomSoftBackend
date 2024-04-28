@@ -2,8 +2,8 @@
 using Application.DTOs;
 using Application.Queries;
 using AutoMapper;
-using Common.Helpers;
-using Domain.Entities;
+using Common.Exceptions;
+using Domain.Core;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,14 +17,16 @@ namespace CustomSoftWebApi.Controllers
     {
         private readonly IMediator mediator;
         private readonly IMapper mapper;
+        private readonly IWebHostEnvironment _env;
 
-        public ProveedoresController(IMediator mediator, IMapper mapper)
+        public ProveedoresController(IMediator mediator, IMapper mapper, IWebHostEnvironment env)
         {
-           this.mediator = mediator;
+            this.mediator = mediator;
             this.mapper = mapper;
+            _env = env;
         }
 
-        
+
         [HttpGet]
         public async Task<IActionResult> Proveedores()
         {
@@ -87,6 +89,20 @@ namespace CustomSoftWebApi.Controllers
             }
 
             return NoContent();
+        }
+        [HttpPost("add-invoices")]
+        public async Task<IActionResult> AddInvoicesToProveedorAsync([FromForm] InvoicesDto invoices)
+        {
+            if (invoices.files == null) return ModelState.ThrowBadRequestObjectResult("Proveedores", "Missing file, please provide a valid one");
+
+            var filesSaved = await mediator.Send(mapper.Map<AddInvoicesCommand>(invoices));
+
+            if(filesSaved)
+            {
+                return Ok();
+            }
+
+            return ModelState.ThrowBadRequestObjectResult("Proveedores", "Unable to save files, please try again");
         }
     }
 }
