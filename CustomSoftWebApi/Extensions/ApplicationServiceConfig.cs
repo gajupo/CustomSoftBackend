@@ -24,7 +24,9 @@ namespace CustomSoftWebApi.Extensions
         public static void ConfigureInfrastructure(this WebApplicationBuilder builder)
         {
             builder.Services.AddScoped<IProveedorRepository, ProveedorRepository>();
-            builder.Services.AddScoped<IArchivoRepository, ArchivoRespository>();
+            builder.Services.AddScoped<IDBArchivoRepository, DBArchivoRepository>();
+            builder.Services.AddScoped<IDiskArchivoRepository, DiskArchivoRepository>();
+
         }
 
         public static void ConfigureMappings(this WebApplicationBuilder builder)

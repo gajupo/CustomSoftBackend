@@ -30,7 +30,7 @@ namespace Infrastructure.Repositories
 
         public async Task<Proveedor> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            var datatable = await _databaseService.ExecuteQueryFuncAsync("sp_get_proveedor(@proveedorId)", cancellationToken, ("proveedorId", id));
+            var datatable = await _databaseService.ExecuteQueryFuncAsync("sp_get_proveedor($1)", cancellationToken, id);
             if (datatable.Rows.Count > 0)
             {
                 return _mapper.Map<Proveedor>(datatable.Rows[0]);

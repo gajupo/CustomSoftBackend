@@ -60,7 +60,7 @@ namespace Infrastructure.Config
             }
         }
 
-        public async Task<DataTable> ExecuteQueryFuncAsync(string funcName, CancellationToken cancellationToken, params (string, object)[] parameters)
+        public async Task<DataTable> ExecuteQueryFuncAsync(string funcName, CancellationToken cancellationToken, params object[] parameters)
         {
             using (var conn = new NpgsqlConnection(_connectionString))
             {
@@ -73,9 +73,9 @@ namespace Infrastructure.Config
                     using (var cmd = new NpgsqlCommand($"SELECT {funcName}", conn, tran))
                     {
 
-                        foreach (var (paramName, value) in parameters)
+                        for (var i = 1; i <= parameters.Length; i++)
                         {
-                            cmd.Parameters.AddWithValue(paramName, value ?? DBNull.Value);
+                            cmd.Parameters.Add(new() { Value = parameters[i - 1] });
                         }
 
                         // Execute the function that returns the cursor

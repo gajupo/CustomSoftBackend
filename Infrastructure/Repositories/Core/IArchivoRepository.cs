@@ -1,10 +1,9 @@
-﻿using Domain.Core;
-using Microsoft.AspNetCore.Http;
+﻿using Domain.Entities;
 
 namespace Infrastructure.Repositories.Core
 {
     public interface IArchivoRepository
     {
-        Task SaveInvoiceFile(IFormFile file, string filePath, CancellationToken cancellationToken);
+        Task<int> SaveInvoiceFile(Archivo archivo, CancellationToken cancellationToken);
     }
 }

@@ -20,6 +20,15 @@ namespace Application.Mappers
             .ForMember(dest => dest.Activo, opt => opt.MapFrom(src => src["activo"]))
             .ForMember(dest => dest.FechaCreacion, opt => opt.MapFrom(src => src["fechacreacion"]));
 
+            CreateMap<DataRow, Archivo>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src["id"]))
+            .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src["nombre"]))
+            .ForMember(dest => dest.TipoArchivo, opt => opt.MapFrom(src => src["tipoarchivo"].ToString()))
+            .ForMember(dest => dest.Ruta, opt => opt.MapFrom(src => src["ruta"]))
+            .ForMember(dest => dest.Tamano, opt => opt.MapFrom(src => src["tamano"]))
+            .ForMember(dest => dest.Extension, opt => opt.MapFrom(src => src["extension"]))
+            .ForMember(dest => dest.ProveedorId, opt => opt.MapFrom(src => src["proveedorid"]));
+
             CreateMap<Proveedor, ProveedorDto>();
             CreateMap<ProveedorDto, Proveedor>();
 

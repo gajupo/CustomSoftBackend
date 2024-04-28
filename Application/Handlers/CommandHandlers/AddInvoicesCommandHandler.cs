@@ -1,8 +1,10 @@
 ﻿using Application.Commands;
 using AutoMapper;
+using Domain.Entities;
 using Infrastructure.Repositories.Core;
 using MediatR;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
 
 
@@ -10,25 +12,30 @@ namespace Application.Handlers.CommandHandlers
 {
     public class AddInvoicesCommandHandler : IRequestHandler<AddInvoicesCommand, bool>
     {
-        private readonly IArchivoRepository archivoRepository;
-        private readonly IMapper mapper;
+        private readonly IDBArchivoRepository dbArchivoRepository;
+        private readonly IDiskArchivoRepository diskArchivoRepository;
         private readonly IProveedorRepository proveedorRepository;
         private readonly IConfiguration configuration;
         private readonly string fileRootPath;
+        private readonly ILogger<AddInvoicesCommandHandler> logger;
 
         public AddInvoicesCommandHandler(
-            IArchivoRepository archivoRepository,
-            IMapper mapper,
+            IDBArchivoRepository dbArchivoRepository,
+            IDiskArchivoRepository diskarchivoRepository,
             IProveedorRepository proveedorRepository,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            ILogger<AddInvoicesCommandHandler> logger)
         {
-            this.mapper = mapper;
 
             this.proveedorRepository = proveedorRepository;
 
-            this.archivoRepository = archivoRepository;
+            this.dbArchivoRepository = dbArchivoRepository;
+
+            this.diskArchivoRepository = diskarchivoRepository;
 
             this.configuration = configuration;
+            
+            this.logger = logger;
 
             fileRootPath = configuration.GetValue<string>("FilesRootFolder");
 
@@ -37,31 +44,53 @@ namespace Application.Handlers.CommandHandlers
         {
             if (request.files == null) throw new ValidationException("Files are required");
             if (string.IsNullOrEmpty(fileRootPath)) throw new ValidationException("No detination file root defined, please configure it in appsettings.json");
-            
 
-            // var proveedor = await proveedorRepository.GetByIdAsync(request.ProveedorId, cancellationToken);
-
-            ParallelOptions parallelOptions = new ParallelOptions() {  MaxDegreeOfParallelism = 3 };
-
-            await Parallel.ForEachAsync(request.files.ToArray(), parallelOptions, async (file, CancellationToken) =>
+            try
             {
-               
-                var fileName = Path.GetRandomFileName() + Path.GetExtension(file.FileName);
+                var proveedor = await proveedorRepository.GetByIdAsync(request.ProveedorId, cancellationToken);
+                if (proveedor == null)
+                    throw new ValidationException("The give proveedorId does not exist");
 
-                if(request.DestinationFolder != null && !Directory.Exists(request.DestinationFolder))
+                ParallelOptions parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = 3 };
+
+                await Parallel.ForEachAsync(request.files.ToArray(), parallelOptions, async (file, CancellationToken) =>
                 {
-                    Directory.CreateDirectory(Path.Combine(fileRootPath, request.DestinationFolder.Trim()));
-                }
 
-                var filePath = Path.Combine(fileRootPath, request.DestinationFolder?.Trim() ?? string.Empty, fileName);
+                    var fileName = Path.GetRandomFileName() + Path.GetExtension(file.FileName);
 
-                
-                await archivoRepository.SaveInvoiceFile(file, filePath, cancellationToken);
+                    if (request.DestinationFolder != null && !Directory.Exists(request.DestinationFolder))
+                    {
+                        Directory.CreateDirectory(Path.Combine(fileRootPath, request.DestinationFolder.Trim()));
+                    }
 
-            });
+                    var filePath = Path.Combine(fileRootPath, request.DestinationFolder?.Trim() ?? string.Empty, fileName);
 
-            return true;
+                    var newArchivo = new Archivo()
+                    {
+                        ProveedorId = proveedor.Id,
+                        Content = file,
+                        Extension = Path.GetExtension(file.FileName),
+                        Nombre = fileName,
+                        Ruta = filePath,
+                        TipoArchivo = FileType.Factura,
+                        Tamano = file.Length
+                    };
 
+                    var rowsAffected = await dbArchivoRepository.SaveInvoiceFile(newArchivo, cancellationToken);
+
+                    if (rowsAffected > 0)
+                    {
+                        await diskArchivoRepository.SaveInvoiceFile(newArchivo, cancellationToken);
+                    }
+                });
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Unable to save the files");
+                throw new InvalidOperationException("Unable to save the files", ex);
+            }
         }
     }
 }
