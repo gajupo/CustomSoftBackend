@@ -22,11 +22,11 @@ namespace CustomSoftWebApi.Middlewares
             {
                 _logger.LogError(ex, "An unhandled exception occurred.");
 
-                errorList.Add("GlobalUnHandledException", new string[] { ex.Message });
-
-                var problemDatails = new ValidationProblemDetails(errorList)
+                var problemDatails = new ValidationProblemDetails()
                 {
-                    Status = StatusCodes.Status500InternalServerError
+                    Status = StatusCodes.Status500InternalServerError,
+                    Title = "Unexpected error occurred.",
+                    Detail = ex.Message
                 };
 
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;

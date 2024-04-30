@@ -37,13 +37,13 @@ namespace Application.Handlers.CommandHandlers
             
             this.logger = logger;
 
-            fileRootPath = null;//configuration.GetValue<string>("FilesRootFolder");
+            fileRootPath = configuration.GetValue<string>("FilesRootFolder");
 
         }
         public async Task<bool> Handle(AddInvoicesCommand request, CancellationToken cancellationToken)
         {
             if (request.files == null) throw new ValidationException("Files are required");
-            if (string.IsNullOrEmpty(fileRootPath)) throw new ValidationException("No detination file root defined, please configure it in appsettings.json");
+            if (string.IsNullOrEmpty(fileRootPath)) throw new ValidationException("No destination file root defined, please configure it in appsettings.json");
 
             try
             {
@@ -56,21 +56,21 @@ namespace Application.Handlers.CommandHandlers
                 await Parallel.ForEachAsync(request.files.ToArray(), parallelOptions, async (file, CancellationToken) =>
                 {
 
-                    var fileName = Path.GetRandomFileName() + Path.GetExtension(file.FileName);
+                    //var fileName = Path.GetRandomFileName() + Path.GetExtension(file.FileName);
 
                     if (request.DestinationFolder != null && !Directory.Exists(request.DestinationFolder))
                     {
                         Directory.CreateDirectory(Path.Combine(fileRootPath, request.DestinationFolder.Trim()));
                     }
 
-                    var filePath = Path.Combine(fileRootPath, request.DestinationFolder?.Trim() ?? string.Empty, fileName);
+                    var filePath = Path.Combine(fileRootPath, request.DestinationFolder?.Trim() ?? string.Empty, file.FileName);
 
                     var newArchivo = new Archivo()
                     {
                         ProveedorId = proveedor.Id,
                         Content = file,
                         Extension = Path.GetExtension(file.FileName),
-                        Nombre = fileName,
+                        Nombre = file.FileName,
                         Ruta = filePath,
                         TipoArchivo = FileType.Factura,
                         Tamano = file.Length

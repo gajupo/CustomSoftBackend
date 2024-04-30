@@ -4,6 +4,7 @@ using Application.Queries;
 using AutoMapper;
 using Common.Exceptions;
 using Domain.Core;
+using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -94,6 +95,8 @@ namespace CustomSoftWebApi.Controllers
         public async Task<IActionResult> AddInvoicesToProveedorAsync([FromForm] InvoicesDto invoices)
         {
             if (invoices.files == null) return ModelState.ThrowBadRequestObjectResult("Proveedores", "Missing file, please provide a valid one");
+            if (invoices.ProveedorId <= 0)
+                return ModelState.ThrowBadRequestObjectResult("Proveedores", "ProveedorId paramter is required");
 
             var filesSaved = await mediator.Send(mapper.Map<AddInvoicesCommand>(invoices));
 
