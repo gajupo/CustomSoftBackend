@@ -103,14 +103,14 @@ namespace CustomSoftWebApi.Controllers
             if (invoices.ProveedorId <= 0)
                 return ModelState.ThrowBadRequestObjectResult("Proveedores", "ProveedorId paramter is required");
 
-            var filesSaved = await mediator.Send(mapper.Map<AddInvoicesCommand>(invoices));
+            var result = await mediator.Send(mapper.Map<AddInvoicesCommand>(invoices));
 
-            if(filesSaved)
+            if (result.IsFailed)
             {
-                return Ok();
+                return result.ToErrorResponse();
             }
-
-            return ModelState.ThrowBadRequestObjectResult("Proveedores", "Unable to save files, please try again");
+            
+            return Ok();
         }
     }
 }

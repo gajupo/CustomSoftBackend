@@ -1,16 +1,19 @@
 ﻿using Application.Commands;
 using AutoMapper;
+using Common.Exceptions;
 using Domain.Entities;
+using FluentResults;
 using Infrastructure.Repositories.Core;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 using System.ComponentModel.DataAnnotations;
 
 
 namespace Application.Handlers.CommandHandlers
 {
-    public class AddInvoicesCommandHandler : IRequestHandler<AddInvoicesCommand, bool>
+    public class AddInvoicesCommandHandler : IRequestHandler<AddInvoicesCommand, Result<bool>>
     {
         private readonly IDBArchivoRepository dbArchivoRepository;
         private readonly IDiskArchivoRepository diskArchivoRepository;
@@ -40,16 +43,17 @@ namespace Application.Handlers.CommandHandlers
             fileRootPath = configuration.GetValue<string>("FilesRootFolder");
 
         }
-        public async Task<bool> Handle(AddInvoicesCommand request, CancellationToken cancellationToken)
+        public async Task<Result<bool>> Handle(AddInvoicesCommand request, CancellationToken cancellationToken)
         {
-            if (request.files == null) throw new ValidationException("Files are required");
-            if (string.IsNullOrEmpty(fileRootPath)) throw new ValidationException("No destination file root defined, please configure it in appsettings.json");
+           
+            if (request.files == null) return Result.Fail(new BadRequestError($"Files are required"));
+            if (string.IsNullOrEmpty(fileRootPath)) return Result.Fail(new BadRequestError($"No destination file root defined, please configure it in appsettings.json"));
 
             try
             {
                 var proveedor = await proveedorRepository.GetByIdAsync(request.ProveedorId, cancellationToken);
-                if (proveedor == null)
-                    throw new ValidationException("The give proveedorId does not exist");
+                if (proveedor == null) return Result.Fail(new NotFoundError($"The given id = ${request.ProveedorId} was not found"));
+
 
                 ParallelOptions parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = 3 };
 
@@ -84,12 +88,19 @@ namespace Application.Handlers.CommandHandlers
                     }
                 });
 
-                return true;
+                return Result.Ok(true);
+            }
+            catch (NpgsqlException ex)
+            {
+                logger.LogError(ex, "Something bad happened when working with the  DB");
+                return Result.Fail(new DatabaseError("Something bad happened when working with the  DB")
+                    .CausedBy(ex));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Unable to save the files");
-                throw new InvalidOperationException("Unable to save the files", ex);
+                logger.LogError(ex, "UnExpected error please review the log for more details");
+                return Result.Fail(new UnExpectedError("UnExpected error please review the log for more details")
+                    .CausedBy(ex));
             }
         }
     }
