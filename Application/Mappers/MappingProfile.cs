@@ -36,7 +36,7 @@ namespace Application.Mappers
             CreateMap<ProveedorDto, CreateProveedorCommand>();
 
             CreateMap<UpdateProveedorCommand, Proveedor>();
-            CreateMap<ProveedorDto, UpdateProveedorCommand>();
+            CreateMap<UpdateProveedorDto, UpdateProveedorCommand>();
 
             CreateMap<InvoicesDto, AddInvoicesCommand>();
         }

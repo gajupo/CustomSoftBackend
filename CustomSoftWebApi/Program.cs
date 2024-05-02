@@ -1,6 +1,8 @@
 using Serilog;
 using CustomSoftWebApi.Extensions;
 using CustomSoftWebApi.Middlewares;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 
 // creating a initial log instance, to record messages before the host starts
 Log.Logger = new LoggerConfiguration()
@@ -33,8 +35,26 @@ try
         
     // build the host
     await using var app = builder.Build();
-    
-    // app.UseMiddleware<ErrorHandlerMiddleware>();
+
+    // global unhlandel exception in case some controller or action does not handle some error
+    app.UseExceptionHandler(a => a.Run(async context =>
+    {
+        var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+        var exception = exceptionHandlerPathFeature.Error;
+
+        var problemDetails = new ProblemDetails
+        {
+            Type = "Global.error",
+            Status = StatusCodes.Status500InternalServerError,
+            Title = "An unexpected error occurred!",
+            Detail = exception.Message,
+        };
+
+        context.Response.StatusCode = problemDetails.Status.Value;
+        context.Response.ContentType = "application/problem+json";
+
+        await context.Response.WriteAsJsonAsync(problemDetails);
+    }));
 
     // middlewares section
     app.UseHttpsRedirection();

@@ -67,7 +67,7 @@ namespace CustomSoftWebApi.Controllers
         }
 
         [HttpPut("{proveedorId:int}")]
-        public async Task<IActionResult> UpdateProveedorAsync(int proveedorId,[FromBody]ProveedorDto proveedor)
+        public async Task<IActionResult> UpdateProveedorAsync(int proveedorId,[FromBody]UpdateProveedorDto proveedor)
         {
             if(proveedorId != proveedor.Id)
                 return ModelState.ThrowBadRequestObjectResult("Proveedores", "id paramter should be the same as the id in proveedor object");
