@@ -1,10 +1,10 @@
-﻿using Application.DTOs;
-using Domain.Entities;
+﻿using Domain.Entities;
+using FluentResults;
 using MediatR;
 
 namespace Application.Commands
 {
-    public class CreateProveedorCommand: IRequest<ProveedorDto>
+    public class CreateProveedorCommand: IRequest<Result<Proveedor>>
     {
         public int Id { get; set; }
         public string? Nombre { get; set; }

@@ -3,6 +3,7 @@ using Application.DTOs;
 using Application.Queries;
 using AutoMapper;
 using Common.Exceptions;
+using CustomSoftWebApi.Extensions;
 using Domain.Core;
 using Domain.Entities;
 using MediatR;
@@ -31,35 +32,38 @@ namespace CustomSoftWebApi.Controllers
         [HttpGet]
         public async Task<IActionResult> Proveedores()
         {
-            var proveedores = await mediator.Send(new GetProveedoresListQuery());
+            var result = await mediator.Send(new GetProveedoresListQuery());
+            if(result.IsFailed)
+            {
+                return result.ToErrorResponse();
+            }
 
-            return Ok(proveedores);
+            return Ok(mapper.Map<List<ProveedorDto>>(result.Value));
         }
 
         [HttpGet("{proveedorId:int}")]
         public async Task<IActionResult> Proveedores(int proveedorId)
         {
-            var proveedor = await mediator.Send(new GetProveedorByIdQuery() { Id = proveedorId });
+            var result = await mediator.Send(new GetProveedorByIdQuery() { Id = proveedorId });
 
-            if(proveedor == null)
+            if (result.IsFailed)
             {
-                return ModelState.ThrowNotFoundObjectResult("Proveedores", "Proveedor not found");
+                return result.ToErrorResponse();
             }
 
-            return Ok(proveedor);
+            return Ok(mapper.Map<ProveedorDto>(result.Value));
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateProveedorAsync(ProveedorDto proveedor)
         {
-            var insertedProveedor = await mediator.Send(mapper.Map<CreateProveedorCommand>(proveedor));
+            var result = await mediator.Send(mapper.Map<CreateProveedorCommand>(proveedor));
 
-            if (insertedProveedor == null)
+            if (result.IsFailed)
             {
-                return ModelState.ThrowNotFoundObjectResult("Proveedores", "Proveedor not found");
+                return result.ToErrorResponse();
             }
-
-            return CreatedAtAction(nameof(Proveedores), new { proveedorId = insertedProveedor.Id }, insertedProveedor);
+            return CreatedAtAction(nameof(Proveedores), new { proveedorId = result.Value.Id }, mapper.Map<ProveedorDto>(result.Value));
         }
 
         [HttpPut("{proveedorId:int}")]
@@ -68,11 +72,11 @@ namespace CustomSoftWebApi.Controllers
             if(proveedorId != proveedor.Id)
                 return ModelState.ThrowBadRequestObjectResult("Proveedores", "id paramter should be the same as the id in proveedor object");
 
-            var insertedProveedor = await mediator.Send(mapper.Map<UpdateProveedorCommand>(proveedor));
+            var result = await mediator.Send(mapper.Map<UpdateProveedorCommand>(proveedor));
 
-            if (insertedProveedor == 0)
+            if (result.IsFailed)
             {
-                return ModelState.ThrowBadRequestObjectResult("Proveedores", "Unable to update the given proveedor");
+                return result.ToErrorResponse();
             }
 
             return NoContent();
@@ -82,12 +86,13 @@ namespace CustomSoftWebApi.Controllers
         public async Task<IActionResult> DeleteProveedorAsync(int proveedorId)
         {
 
-            var insertedProveedor = await mediator.Send(new DeleteProveedorCommand() { Id = proveedorId });
+            var result = await mediator.Send(new DeleteProveedorCommand() { Id = proveedorId });
 
-            if (insertedProveedor == 0)
+            if (result.IsFailed)
             {
-                return ModelState.ThrowBadRequestObjectResult("Proveedores", "Unable to delete the given proveedor");
+                return result.ToErrorResponse();
             }
+
 
             return NoContent();
         }

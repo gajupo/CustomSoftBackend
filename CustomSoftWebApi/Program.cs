@@ -34,7 +34,7 @@ try
     // build the host
     await using var app = builder.Build();
     
-    app.UseMiddleware<ErrorHandlerMiddleware>();
+    // app.UseMiddleware<ErrorHandlerMiddleware>();
 
     // middlewares section
     app.UseHttpsRedirection();
