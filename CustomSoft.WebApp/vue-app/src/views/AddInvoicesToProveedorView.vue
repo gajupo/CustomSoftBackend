@@ -2,7 +2,7 @@
     <v-layout class="rounded rounded-md">
         <v-navigation-drawer>
             <ul class="nostyle">
-                <TreeItem class="item" :model="treeData"></TreeItem>
+                <TreeItem class="item" :model="treeData" @set-folder="setDestinationFolder"></TreeItem>
             </ul>
         </v-navigation-drawer>
 
@@ -125,6 +125,10 @@ export default {
             });
             console.log(rootNode)
             this.treeData = rootNode
+        },
+        setDestinationFolder(folderName) {
+            console.log('hit here')
+            this.destinationFolder = folderName
         }
     }
 };

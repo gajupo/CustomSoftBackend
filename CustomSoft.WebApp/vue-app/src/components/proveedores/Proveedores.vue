@@ -15,75 +15,129 @@
     </v-row>
     <v-row align="center" justify="center">
         <v-col cols="auto">
-            <v-table :hover="true" density="comfortable">
-                <thead>
-                    <tr>
-                        <th class="text-left">
-                            Nombre Proveedor
-                        </th>
-                        <th class="text-left">
-                            RFC
-                        </th>
-                        <th class="text-left">
-                            Fecha Alta
-                        </th>
-                        <th class="text-left">
-                            Direccion
-                        </th>
-                        <th class="text-left">
-                            Activo
-                        </th>
-                        <th class="text-left">
-                            Facturas
-                        </th>
-                        <th class="text-left">
+            <v-data-table-server v-model:items-per-page="itemsPerPage"
+                                 :headers="headers"
+                                 :items="proveedores.items"
+                                 :items-length="proveedores.totalCount"
+                                 :loading="loading"
+                                 :search="search"
+                                 item-value="name"
+                                 @update:options="loadProveedores">
+                <template v-slot:item.fechaAlta="{ item }">
+                    <div class="text-end">
+                        {{ formatFechaAlta(item.fechaAlta.toString()) }}
+                    </div>
+                </template>
+                <template v-slot:item.activo="{ item }">
+                    <div class="text-end">
+                        <v-chip :color="item.activo ? 'green' : 'red'"
+                                :text="item.activo ? 'Activo' : 'Desactivado'"
+                                class="text-uppercase"
+                                size="small"
+                                label></v-chip>
+                    </div>
+                </template>
+                <template v-slot:item.numFacturas="{ item }">
+                    <div class="text-end">
+                        {{ item.archivos.length }}
+                    </div>
+                </template>
+                <template v-slot:item.menuActions="{ item }">
+                    <ProveedorActions @item-deleted="showDialogRemoveProveedor(item.id)"
+                                      @item-edited="editProveedor(item)"
+                                      @add-invoices="addFacturas(item.id)"></ProveedorActions>
+                </template>
+            </v-data-table-server>
 
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="proveedor in proveedores"
-                        :key="proveedor.id">
-                        <proveedor :proveedor="proveedor"
-                                   @item-deleted="removeProveedor(proveedor.id)"
-                                   @item-edited="editProveedor(proveedor)"
-                                   @add-invoices="addFacturas(proveedor.id)">
-                        </proveedor>
-                    </tr>
-                </tbody>
-            </v-table>
+            <v-dialog v-model="deleteDialog"
+                      max-width="400"
+                      persistent>
+                <v-card prepend-icon="mdi-delete"
+                        text="¿Estás seguro de liminar el registro?"
+                        title="Eliminar Proveedor">
+                    <template v-slot:actions>
+                        <v-spacer></v-spacer>
+
+                        <v-btn @click.prevent="hiddeDialogRemoveProveedor">
+                            Cancelar
+                        </v-btn>
+
+                        <v-btn @click.prevent="removeProveedor">
+                            Aceptar
+                        </v-btn>
+                    </template>
+                </v-card>
+            </v-dialog>
         </v-col>
     </v-row>
 </template>
 
 
 <script>
-    import Proveedor from './Proveedor.vue'
+    import { parseISO, format } from 'date-fns'
+    import ProveedorActions from './ProveedorActions.vue'
+    import GenericDataUpdateDilalog from '../dialogs/GenericDataUpdateDilalog.vue'
 
     export default {
         components: {
-            Proveedor
+            ProveedorActions,
+            GenericDataUpdateDilalog
         },
         data() {
             return {
-                proveedores: []
-            }
-        },
-        async mounted() {
-            try {
-                this.proveedores = await this.$api.get('/proveedores');
-            } catch (e) {
-                console.error(e)
+                currentIdToBeDeleted: 0,
+                deleteDialog: false,
+                proveedores: [],
+                page:1,
+                itemsPerPage: 5,
+                search: '',
+                loading: true,
+                headers: [
+                  {
+                    align: 'start',
+                    key: 'nombre',
+                    sortable: false,
+                    title: 'Nombre Proveedor',
+                  },
+                  { title: 'RFC', key: 'rfc', sortable: false },
+                  { title: 'Fecha Alta', key: 'fechaAlta', sortable: false },
+                  { title: 'Dirección', key: 'direccion', sortable: false },
+                  { title: 'Activo', key: 'activo', sortable: false },
+                  { title: '#Facturas', key: 'numFacturas', sortable: false },
+
+                  { title: 'Menú', key: 'menuActions', sortable: false },
+                ]
             }
         },
         methods: {
-            async removeProveedor(proveedorId) {
-                const result = await this.$api.delete(`/proveedores/${proveedorId}`);
+            async loadProveedores({page, itemsPerPage}){
+                 try {
+
+                     this.loading = true
+                     this.proveedores = await this.$api.get(`/proveedores?pageNumber=${page}&pageSize=${itemsPerPage}`);
+                     this.loading = false
+                 } catch (e) {
+                     console.error(e)
+                 }
+            },
+            showDialogRemoveProveedor(proveedorId)
+            {
+                this.deleteDialog = true;
+                this.currentIdToBeDeleted = proveedorId;
+            },
+            hiddeDialogRemoveProveedor()
+            {
+                this.deleteDialog = false;
+                this.currentIdToBeDeleted = 0;
+            },
+            async removeProveedor() {
+
+                const result = await this.$api.delete(`/proveedores/${this.currentIdToBeDeleted}`);
 
                 if (result) {
-                    const itemIndex = this.proveedores.findIndex((item) => item.id === proveedorId);
-                    this.proveedores.splice(itemIndex, 1)
-
+                    const itemIndex = this.proveedores.items.findIndex((item) => item.id === this.currentIdToBeDeleted);
+                    this.proveedores.items.splice(itemIndex, 1)
+                    this.hiddeDialogRemoveProveedor()
                 }
             },
             editProveedor(proveedor) {
@@ -95,6 +149,17 @@
             addFacturas(proveedorId) {
                 this.$router.push({ name: 'AddInvoicesToProveedorView', params: { id: parseInt(proveedorId) } });
             },
+            formatFechaAlta(value) {
+                const date = parseISO(value)
+                return format(date, 'dd/MM/yyyy HH:mm:ss')
+            }
         },
     }
 </script>
+
+<style scoped>
+    .v-data-table {
+        width: 1138px;
+        min-height: 370px;
+    }
+</style>

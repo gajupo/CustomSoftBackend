@@ -29,7 +29,7 @@ namespace CustomSoftWebApi.Controllers
 
         [HttpGet]
         [Proveedor_ValidatedPagedImputParamsAttribute]
-        public async Task<IActionResult> Proveedores([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> Proveedores([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
             var result = await mediator.Send(new GetProveedoresListQuery() { pageNumber = pageNumber, pageSize = pageSize});
             if(result.IsFailed)

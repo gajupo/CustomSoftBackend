@@ -1,22 +1,22 @@
 ﻿<template>
     <v-container>
-        <v-form @submit.prevent="updateProvider">
+        <v-form v-model="form" @submit.prevent="updateProvider">
             <v-text-field v-model="provider.nombre"
-                          label="Nombre del Proveedor"
-                          required></v-text-field>
+                          :rules="[rules.required]"
+                          label="Nombre del Proveedor"></v-text-field>
 
             <v-text-field v-model="provider.rfc"
-                          label="RFC"
-                          required></v-text-field>
+                          :rules="[rules.required, rules.validateRfc]"
+                          label="RFC"></v-text-field>
 
             <v-text-field v-model="provider.direccion"
-                          label="Dirección"
-                          required></v-text-field>
+                           :rules="[rules.required]"
+                          label="Dirección"></v-text-field>
 
             <v-switch v-model="provider.activo"
                       label="Activo"></v-switch>
 
-            <v-btn color="primary" type="submit">
+            <v-btn :disabled="!form" color="primary" type="submit">
                 Guardar
             </v-btn>
             <v-btn class="mx-2" @click="cancelAction" color="primary" type="submit">
@@ -43,6 +43,11 @@
                     fechaCreacion: '',
                     archivos: []
                 },
+                rules: {
+                    required: value => !!value || 'Required.',
+                    validateRfc: value => /^[A-Z&Ñ]{3,4}[0-9]{2}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])[A-Z0-9]{2}[0-9A]$/.test(value) || 'RFC invalid format'
+                },
+                form: false,
             };
         },
         async mounted() {

@@ -1,4 +1,5 @@
-﻿using CustomSoft.WebApp.Server.Data;
+﻿using CustomSoft.WebApp.Filters;
+using CustomSoft.WebApp.Server.Data;
 using CustomSoft.WebApp.Server.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using System.Reflection;
@@ -15,9 +16,10 @@ namespace CustomSoft.WebApp.Controllers
         {
             _webApiExecuter = webApiExecuter;
         }
-        public async Task<IActionResult> Proveedores()
+        [Proveedor_ValidatedPagedImputParamsAttribute]
+        public async Task<IActionResult> Proveedores([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
-            var shirtList = await _webApiExecuter.InvokeGet<PagedProveedorDTO>("proveedores");
+            var shirtList = await _webApiExecuter.InvokeGet<PagedProveedorDTO>($"proveedores?pageNumber={pageNumber}&pageSize={pageSize}");
 
             return Ok(shirtList);
         }
