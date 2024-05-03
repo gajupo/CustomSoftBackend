@@ -17,7 +17,7 @@ namespace CustomSoft.WebApp.Controllers
         }
         public async Task<IActionResult> Proveedores()
         {
-            var shirtList = await _webApiExecuter.InvokeGet<List<ProveedorDto>>("proveedores");
+            var shirtList = await _webApiExecuter.InvokeGet<PagedProveedorDTO>("proveedores");
 
             return Ok(shirtList);
         }
