@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Handlers.QueryHandlers
 {
-    public class GetProveedorListHandler : IRequestHandler<GetProveedoresListQuery, Result<List<Proveedor>>>
+    public class GetProveedorListHandler : IRequestHandler<GetProveedoresListQuery, Result<(List<Proveedor>, int)>>
     {
         private readonly IProveedorRepository _proveedorRespository;
         private readonly IDBArchivoRepository _dbArchivoRepository;
@@ -22,18 +22,19 @@ namespace Application.Handlers.QueryHandlers
             _dbArchivoRepository = dbArchivoRepository;
             _logger = logger;
         }
-        public async Task<Result<List<Proveedor>>> Handle(GetProveedoresListQuery request, CancellationToken cancellationToken)
+        public async Task<Result<(List<Proveedor>, int)>> Handle(GetProveedoresListQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                var proveedores = await _proveedorRespository.GetAllAsync(cancellationToken);
+                var (proveedores, totalRows) = await _proveedorRespository.GetAllAsync(request.pageNumber, request.pageSize,cancellationToken);
 
-                await Parallel.ForEachAsync(proveedores, async (proveedor, CancellationToken) =>
+                ParallelOptions parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = 3 };
+                await Parallel.ForEachAsync(proveedores, parallelOptions, async (proveedor, CancellationToken) =>
                 {
                     proveedor.Archivos = await _dbArchivoRepository.GetAllArchivosByProveedorAsync(proveedor.Id, cancellationToken);
                 });
 
-                return Result.Ok(proveedores);
+                return Result.Ok((proveedores, totalRows));
             }
             catch (NpgsqlException ex)
             {

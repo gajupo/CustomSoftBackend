@@ -2,7 +2,6 @@
 using Domain.Entities;
 using Infrastructure.Config;
 using Infrastructure.Repositories.Core;
-using System.Data;
 
 namespace Infrastructure.Repositories
 {
@@ -17,15 +16,22 @@ namespace Infrastructure.Repositories
             _mapper = mapper;
         }
 
-        public async Task<List<Proveedor>> GetAllAsync(CancellationToken cancellationToken)
+        public async Task<(List<Proveedor>, int)> GetAllAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
         {
-            var datatable = await _databaseService.ExecuteQueryFuncAsync("sp_get_all_proveedores()", cancellationToken);
+            var paramValues = new object[]
+            {
+                pageSize,
+                pageNumber
+            };
+            var totalRows = await _databaseService.ExecuteNonQueryFuncAsync("get_total_rows_proveedores()", cancellationToken, paramValues);
+            var datatable = await _databaseService.ExecuteQueryFuncAsync("sp_get_all_proveedores($1,$2)", cancellationToken, paramValues);
+            
             if (datatable.Rows.Count > 0)
             {
-                return _mapper.Map<List<Proveedor>>(datatable.Rows);
+                return (_mapper.Map<List<Proveedor>>(datatable.Rows), totalRows);
             }
             
-            return new List<Proveedor>();
+            return (new List<Proveedor>(), 0);
         }
 
         public async Task<Proveedor> GetByIdAsync(int id, CancellationToken cancellationToken)

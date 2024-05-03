@@ -2,10 +2,8 @@
 using Application.DTOs;
 using Application.Queries;
 using AutoMapper;
-using Common.Exceptions;
 using CustomSoftWebApi.Extensions;
-using Domain.Core;
-using Domain.Entities;
+using CustomSoftWebApi.Filters;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -30,15 +28,16 @@ namespace CustomSoftWebApi.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> Proveedores()
+        [Proveedor_ValidatedPagedImputParamsAttribute]
+        public async Task<IActionResult> Proveedores([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await mediator.Send(new GetProveedoresListQuery());
+            var result = await mediator.Send(new GetProveedoresListQuery() { pageNumber = pageNumber, pageSize = pageSize});
             if(result.IsFailed)
             {
                 return result.ToErrorResponse();
             }
-
-            return Ok(mapper.Map<List<ProveedorDto>>(result.Value));
+            var mappedProveedoredToDto = mapper.Map<List<ProveedorDto>>(result.Value.Item1);
+            return Ok(mappedProveedoredToDto.ToPagedResult(pageNumber, pageSize, result.Value.Item2));
         }
 
         [HttpGet("{proveedorId:int}")]

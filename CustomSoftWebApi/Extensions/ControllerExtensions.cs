@@ -1,4 +1,5 @@
-﻿using Common.Exceptions;
+﻿using Application.DTOs;
+using Common.Exceptions;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -79,6 +80,20 @@ namespace CustomSoftWebApi.Extensions
             };
 
             return new NotFoundObjectResult(problemDetails);
+        }
+
+        public static PagedProveedorDTO ToPagedResult(this List<ProveedorDto> proveedors, int pageNumber, int pageSize, int totalCount)
+        {
+            var response = new PagedProveedorDTO()
+            {
+                TotalCount = totalCount,
+                PageSize = pageSize,
+                CurrentPage = pageNumber,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                Items = proveedors,
+            };
+
+            return response;
         }
     }
 }

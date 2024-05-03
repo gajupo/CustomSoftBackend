@@ -105,9 +105,7 @@ namespace Infrastructure.Config
             {
                 await conn.OpenAsync(cancellationToken);
 
-                // Start a transaction as cursors require to run within a transaction in PostgreSQL
                 using var tran = await conn.BeginTransactionAsync();
-                // Call the function which returns a cursor
                 using var cmd = new NpgsqlCommand($"SELECT {funcName}", conn, tran);
 
                 for (var i = 1; i <= parameters.Length; i++)
@@ -115,11 +113,11 @@ namespace Infrastructure.Config
                     cmd.Parameters.Add(new() { Value = parameters[i - 1] });
                 }
 
-                var insertedId = await cmd.ExecuteScalarAsync();
-                if (insertedId != null)
+                var returnedValue = await cmd.ExecuteScalarAsync();
+                if (returnedValue != null)
                 {
                     tran.Commit();
-                    return (int)insertedId;
+                    return (int)returnedValue;
                 }
                 else
                     return 0;
