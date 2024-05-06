@@ -60,7 +60,7 @@ try
     app.UseHttpsRedirection();
     app.UseAuthentication();
     app.UseAuthorization();
-
+    app.UseStaticFiles();
     app.MapControllers();
 
     // runing the app async

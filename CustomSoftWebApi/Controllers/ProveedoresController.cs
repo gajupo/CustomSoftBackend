@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CustomSoftWebApi.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ProveedoresController : ControllerBase
@@ -110,6 +110,20 @@ namespace CustomSoftWebApi.Controllers
             }
             
             return Ok();
+        }
+        [HttpGet("export-xlsx")]
+        public async Task<IActionResult> ExportProveedoresByDateRangeAsync([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        {
+            var result = await mediator.Send(new GetProveedoresByDateRangeQuery() { StartDate = startDate, EndDate = endDate });
+
+            if (result.IsFailed)
+            {
+                return result.ToErrorResponse();
+            }
+
+            return File(result.ToStream(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"ListaDeProveedores-{startDate:yyyy-MM-dd}-{endDate:yyyy-MM-dd}.xlsx");
         }
     }
 }

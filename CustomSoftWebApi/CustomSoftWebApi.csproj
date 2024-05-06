@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="ClosedXML.Extensions.WebApi" Version="0.3.0" />
     <PackageReference Include="FluentResults" Version="3.15.2" />
     <PackageReference Include="LanguageExt.Core" Version="4.4.8" />
     <PackageReference Include="MediatR" Version="12.2.0" />

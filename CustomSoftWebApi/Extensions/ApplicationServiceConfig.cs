@@ -6,8 +6,9 @@ using Authentication.ApiKeys.Abstractions;
 using Authentication.ApiKeys;
 using Common;
 using Serilog;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Domain.Core;
+using Infrastructure.Services;
 
 
 namespace CustomSoftWebApi.Extensions
@@ -26,6 +27,7 @@ namespace CustomSoftWebApi.Extensions
             builder.Services.AddScoped<IProveedorRepository, ProveedorRepository>();
             builder.Services.AddScoped<IDBArchivoRepository, DBArchivoRepository>();
             builder.Services.AddScoped<IDiskArchivoRepository, DiskArchivoRepository>();
+            builder.Services.AddScoped<IExcelService, ExcelService>();
 
         }
 

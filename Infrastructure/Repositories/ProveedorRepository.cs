@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Domain.Entities;
 using Infrastructure.Config;
 using Infrastructure.Repositories.Core;
+using System.Data;
 
 namespace Infrastructure.Repositories
 {
@@ -82,7 +84,24 @@ namespace Infrastructure.Repositories
 
         public Task<int> DeleteAsync(int id, CancellationToken cancellationToken)
         {
-            return _databaseService.ExecuteNonQuerySPAsync("sp_delete_proveedor", cancellationToken, new object[] { id });
+            return _databaseService.ExecuteNonQuerySPAsync("sp_delete_proveedor", cancellationToken, id);
+        }
+
+        public async Task<DataTable> GetAllByCreatedRangeDateAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken)
+        {
+            var paramValues = new object[]
+            {
+                startDate,
+                endDate
+            };
+            var datatable = await _databaseService.ExecuteQueryFuncAsync("sp_get_all_proveedores_by_date_range($1,$2)", cancellationToken, paramValues);
+
+            if (datatable.Rows.Count > 0)
+            {
+                return datatable;
+            }
+
+            return new DataTable();
         }
     }
 }
