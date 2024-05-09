@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CustomSoftWebApi.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ProveedoresController : ControllerBase
