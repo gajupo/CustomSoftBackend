@@ -122,8 +122,7 @@ namespace CustomSoftWebApi.Controllers
             }
 
             return File(result.ToStream(),
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                $"ListaDeProveedores-{startDate:yyyy-MM-dd}-{endDate:yyyy-MM-dd}.xlsx");
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         }
     }
 }

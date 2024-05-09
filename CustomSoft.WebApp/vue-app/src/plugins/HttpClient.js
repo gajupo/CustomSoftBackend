@@ -16,6 +16,19 @@
         }
     }
 
+    async getAsBlob(path) {
+        try {
+            const response = await fetch(`${this.baseURL}${path}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return await response.blob();
+        } catch (error) {
+            console.error("HTTP GET Request Failed: ", error);
+            throw error;
+        }
+    }
+
     async post(path, data, json = true) {
         try {
             const headers = json ? { 'Content-Type': 'application/json' } : {};

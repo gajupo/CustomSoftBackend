@@ -150,6 +150,16 @@ namespace CustomSoft.WebApp.Controllers
             }
         }
 
+        [HttpGet("export-xlsx")]
+        public async Task<IActionResult> ExportProveedoresByDateRangeAsync([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        {
+            var streamFile = await _webApiExecuter.InvokeGetAsStream($"proveedores/export-xlsx?startDate={startDate}&endDate={endDate}");
+            streamFile.Seek(0, SeekOrigin.Begin);
+            return File(streamFile,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"ListaDeProveedores-{startDate:yyyy-MM-dd}-{endDate:yyyy-MM-dd}.xlsx");
+        }
+
         private ObjectResult HandleWebApiException(WebApiException ex)
         {
             if (ex.ErrorResponse != null && ex.ErrorResponse.Errors != null && ex.ErrorResponse.Errors.Count > 0)

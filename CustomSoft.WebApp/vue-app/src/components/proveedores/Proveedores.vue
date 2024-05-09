@@ -3,13 +3,24 @@
         <v-col cols="12" class="text-center">
             <h2>Lista de Proveedores</h2>
         </v-col>
-        <v-col cols="12" class="text-center">
+    </v-row>
+    <v-row>
+        <v-col cols="6" class="text-center">
             <v-btn class="text-none text-white"
                    color="success"
                    rounded="1"
                    variant="elevated"
                    @click="registerProvider">
                 Registrar Proveedor
+            </v-btn>
+        </v-col>
+        <v-col cols="6" class="text-center">
+            <v-btn class="text-none text-white"
+                   color="primary"
+                   rounded="1"
+                   variant="elevated"
+                   @click="isExportDialogOpen = true">
+                Exportar Proveedores
             </v-btn>
         </v-col>
     </v-row>
@@ -68,6 +79,7 @@
                     </template>
                 </v-card>
             </v-dialog>
+            <ExportProveedoresDialog v-model="isExportDialogOpen"></ExportProveedoresDialog>
         </v-col>
     </v-row>
 </template>
@@ -76,17 +88,18 @@
 <script>
     import { parseISO, format } from 'date-fns'
     import ProveedorActions from './ProveedorActions.vue'
-    import GenericDataUpdateDilalog from '../dialogs/GenericDataUpdateDilalog.vue'
+    import ExportProveedoresDialog from '../dialogs/ExportProveedoresDialog.vue'
 
     export default {
         components: {
             ProveedorActions,
-            GenericDataUpdateDilalog
+            ExportProveedoresDialog
         },
         data() {
             return {
                 currentIdToBeDeleted: 0,
-                deleteDialog: false,
+                isExportDialogOpen: false,
+                exportDialog: false,
                 proveedores: [],
                 page:1,
                 itemsPerPage: 5,

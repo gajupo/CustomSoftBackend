@@ -1,4 +1,5 @@
-﻿namespace CustomSoft.WebApp.Server.Data
+﻿
+namespace CustomSoft.WebApp.Server.Data
 {
     public class WebApiExecuter : IWebApiExecuter
     {
@@ -67,6 +68,17 @@
                 var errorJson = await response.Content.ReadAsStringAsync();
                 throw new WebApiException(errorJson);
             }
+        }
+
+        public async Task<Stream> InvokeGetAsStream(string relativeUrl)
+        {
+            var httpClient = _httpClientFactory.CreateClient(ApiName);
+            var request = new HttpRequestMessage(HttpMethod.Get, relativeUrl);
+            var response = await httpClient.SendAsync(request);
+
+            await HandlePotentialError(response);
+
+            return await response.Content.ReadAsStreamAsync();
         }
     }
 }
